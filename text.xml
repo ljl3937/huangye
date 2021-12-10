@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ttFont sfntVersion="\x00\x01\x00\x00" ttLibVersion="4.12">
+<ttFont sfntVersion="\x00\x01\x00\x00" ttLibVersion="4.28">
 
   <GlyphOrder>
     <!-- The 'id' attribute is only for humans; it is ignored when parsed. -->
@@ -25,7 +25,7 @@
     <!-- Most of this table will be recalculated by the compiler -->
     <tableVersion value="1.0"/>
     <fontRevision value="1.0"/>
-    <checkSumAdjustment value="0xaa1c85d3"/>
+    <checkSumAdjustment value="0xaa6885f9"/>
     <magicNumber value="0x5f0f3cf5"/>
     <flags value="00000000 00001011"/>
     <unitsPerEm value="1024"/>
@@ -119,7 +119,7 @@
     <achVendID value="PfEd"/>
     <fsSelection value="00000000 11000000"/>
     <usFirstCharIndex value="35"/>
-    <usLastCharIndex value="33269"/>
+    <usLastCharIndex value="33250"/>
     <sTypoAscender value="812"/>
     <sTypoDescender value="-212"/>
     <sTypoLineGap value="92"/>
@@ -182,16 +182,16 @@
       <map code="0x2b" name="plus"/><!-- PLUS SIGN -->
       <map code="0x2d" name="hyphen"/><!-- HYPHEN-MINUS -->
       <map code="0x2f" name="slash"/><!-- SOLIDUS -->
-      <map code="0x881ec" name="zero"/><!-- ???? -->
-      <map code="0x881ed" name="one"/><!-- ???? -->
-      <map code="0x881ee" name="two"/><!-- ???? -->
-      <map code="0x881ef" name="three"/><!-- ???? -->
-      <map code="0x881f0" name="four"/><!-- ???? -->
-      <map code="0x881f1" name="five"/><!-- ???? -->
-      <map code="0x881f2" name="six"/><!-- ???? -->
-      <map code="0x881f3" name="seven"/><!-- ???? -->
-      <map code="0x881f4" name="eight"/><!-- ???? -->
-      <map code="0x881f5" name="nine"/><!-- ???? -->
+      <map code="0x881d9" name="zero"/><!-- ???? -->
+      <map code="0x881da" name="one"/><!-- ???? -->
+      <map code="0x881db" name="two"/><!-- ???? -->
+      <map code="0x881dc" name="three"/><!-- ???? -->
+      <map code="0x881dd" name="four"/><!-- ???? -->
+      <map code="0x881de" name="five"/><!-- ???? -->
+      <map code="0x881df" name="six"/><!-- ???? -->
+      <map code="0x881e0" name="seven"/><!-- ???? -->
+      <map code="0x881e1" name="eight"/><!-- ???? -->
+      <map code="0x881e2" name="nine"/><!-- ???? -->
     </cmap_format_12>
   </cmap>
 

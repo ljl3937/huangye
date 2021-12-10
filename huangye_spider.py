@@ -41,14 +41,18 @@ def make_font_file(base64_string: str):
 
 
 def get_num(bs64_str,string):
-    font = TTFont(BytesIO(base64.decodebytes(bs64_str.encode())))
+    # font = TTFont(BytesIO(base64.decodebytes(bs64_str.encode())))
+    font = TTFont(BytesIO(make_font_file(bs64_str)))
     c = font['cmap'].tables[0].ttFont.tables['cmap'].tables[3].cmap
+    print(c)
     ret_list = []
     for char in string:
         decode_num = ord(char)
+        print(decode_num)
         c1 = c
         if decode_num in c1:
             num = c1[decode_num]
+            print(num)
             num = map[num]
             ret_list.append(num)
         else:
@@ -70,6 +74,7 @@ def getTels(base_url, type, path):
     f = codecs.open(path, 'a', 'utf8')
     while pn > 0:
         url = base_url + 'pn' + str(pn)
+        print(url)
         html = download(url)
         if html:
             print('正在爬取' + type + '第' + str(pn) + '页')
@@ -85,8 +90,9 @@ def getTels(base_url, type, path):
                         res = download(url1)
                         # res = requests.get(url1)
                         # bs64_str = re.findall("charset=utf-8;base64,(.*?)\"\)", res.text)[0]
-                        bs64_str = re.findall("charset=utf-8;base64,(.*?)\"\)", res)[0]
+                        print(url1)
                         html1 = download(url1)
+                        bs64_str = re.findall("charset=utf-8;base64,(.*?)\"\)", html1)[0]
                         tel = ''
                         # infos = []
                         if html1:
@@ -137,7 +143,7 @@ def getItemURL(base_url):
 def main(args):
     urls = getItemURL(TYPES[args])
     mongo_table = db[args]
-    path = '/Users/lijialin/Documents/hy/' + args
+    path = '/run/media/jialin/Seagate/work/data/' + args
     # print(urls)
     for url in urls:
         for title in url:
@@ -154,7 +160,7 @@ if __name__ == '__main__':
     # args = product(ADDRESS, number_list)
     # for arg in args:
     #     print(arg)
-    args = ['物流', ]
+    args = ['jiudian', 'lingshi']
     pool = Pool()
     pool.map(main, args)  # 多进程运行
     end = time.time()

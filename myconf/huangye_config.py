@@ -19,8 +19,9 @@ ADDRESS = ['北京']
 
 
 TYPES = {
-	'物流': 'http://b2b.huangye88.com/qiye/wuliu/',
+	'jiudian': 'http://b2b.huangye88.com/qiye/jiudian/',
+	'lingshi': 'http://b2b.huangye88.com/qiye/lingshi/',
 	}
 
-MONGO_URI = 'localhost'
-MONGO_DB = 'myconf'
+MONGO_URI = 'mongodb://172.16.100.2:32178'
+MONGO_DB = 'huangye'

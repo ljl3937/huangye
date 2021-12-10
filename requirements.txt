@@ -1,0 +1,5 @@
+pymongo
+require
+bs4
+fontTools
+lxml
