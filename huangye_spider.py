@@ -63,7 +63,7 @@ def get_num(bs64_str,string):
     return ret_str_show
 
 def download(url):
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:51.0) Gecko/20100101 Firefox/51.0'}
+    headers = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36'}
     response = requests.get(url, headers=headers)
     return response.text
 

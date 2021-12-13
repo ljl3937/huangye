@@ -1,5 +1,5 @@
 pymongo
-require
+requests
 bs4
 fontTools
 lxml
