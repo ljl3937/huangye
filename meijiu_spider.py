@@ -1,66 +1,16 @@
 # Code based on Python 3.x
 # _*_ coding: utf-8 _*_
 # __Author: "LEMON"
-import base64
 import re
-from datetime import datetime
 from multiprocessing import Pool
 import requests
 from bs4 import BeautifulSoup
 import pymongo
-from fontTools.ttLib import TTFont, BytesIO
 
-from myconf.huangye_config import *
+from myconf.meijiu_config import *
 import time
-from itertools import product
 import codecs
 
-client = pymongo.MongoClient(MONGO_URI)
-db = client[MONGO_DB]
-map = {
-    "one": 1,
-    "two": 2,
-    "three": 3,
-    "four": 4,
-    "five": 5,
-    "six": 6,
-    "seven": 7,
-    "eight": 8,
-    "nine": 9,
-    "zero": 0
-}
-
-def make_font_file(base64_string: str):
-    bin_data = base64.decodebytes(base64_string.encode())
-    with open('text.otf', 'wb') as f:
-        f.write(bin_data)
-    return bin_data
-#
-# font = TTFont(BytesIO(make_font_file(base64_str)))
-# c = font['cmap'].tables[0].ttFont.tables['cmap'].tables[3].cmap
-
-
-def get_num(bs64_str,string):
-    # font = TTFont(BytesIO(base64.decodebytes(bs64_str.encode())))
-    font = TTFont(BytesIO(make_font_file(bs64_str)))
-    c = font['cmap'].tables[0].ttFont.tables['cmap'].tables[3].cmap
-    print(c)
-    ret_list = []
-    for char in string:
-        decode_num = ord(char)
-        print(decode_num)
-        c1 = c
-        if decode_num in c1:
-            num = c1[decode_num]
-            print(num)
-            num = map[num]
-            ret_list.append(num)
-        else:
-            ret_list.append(char)
-    ret_str_show = ''
-    for num in ret_list:
-        ret_str_show += str(num)
-    return ret_str_show
 
 def download(url):
     headers = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36'}
@@ -68,40 +18,53 @@ def download(url):
     return response.text
 
 
-def getTels(base_url, type, path):
+def getCityURL():
+    html = download("http://www.9928.tv/company")
+    soup = BeautifulSoup(html, 'lxml')
+    body = soup.body
+    urls = []
+    for pro in ADDRESS:
+        data_main = body.find_all('a',text=pro)
+        for a in data_main:
+            hr = a['href']
+            if 'http' not in hr:
+                url = 'http://www.9928.tv' + hr
+                tmp = (a.text, url)
+                urls.append(tmp)
+    return urls
+
+def getTels(city_url, path):
+    base_url = city_url[0]
+    type = city_url[1]
     time.sleep(3)
     tels = []
     pn = 1
     f = codecs.open(path, 'a', 'utf8')
     while pn > 0:
-        url = base_url + 'pn' + str(pn)
+        url = base_url + str(pn)
         print(url)
         html = download(url)
         if html:
             print('正在爬取' + type + '第' + str(pn) + '页')
             soup = BeautifulSoup(html, 'lxml')
             body = soup.body
-            data_main = body.find('form', {'name': 'jubao'})
+            data_main = body.find('div', {'class': 'qyk_css08'})
             if data_main:
-                dls = data_main.find_all('dl')
-                for dl in dls:
+                qys = data_main.find_all('div', {'class':'qy_div'})
+                for qy in qys:
                     try:
-                        name = dl.find('h4').find('a').get_text()
-                        url1 = dl.find('h4').find('a').get('href')
-                        res = download(url1)
-                        # res = requests.get(url1)
-                        # bs64_str = re.findall("charset=utf-8;base64,(.*?)\"\)", res.text)[0]
+                        name = qy.find('b').find('a').get_text()
+                        url_str = qy.find('b').find('a').get('href')
+                        url1 = 'http://www.9928.tv' + url_str
                         print(url1)
                         html1 = download(url1)
-                        bs64_str = re.findall("charset=utf-8;base64,(.*?)\"\)", html1)[0]
                         tel = ''
                         # infos = []
                         if html1:
                             soup1 = BeautifulSoup(html1, 'lxml')
                             body1 = soup1.body
-                            tel_el = body1.find("span", class_="secret")
-                            tel_data = tel_el.get_text()
-                            tel = get_num(bs64_str, tel_data)
+                            tel_el = body1.find("div", class_="quick_nav").find("p", class_="nav_c")
+                            tel = tel_el.get_text()
                         info = "%s %s" % (name,tel)
                         # infos.append(info)
                         print(info)
@@ -141,9 +104,8 @@ def getItemURL(base_url):
             urls.append({title: link})
     return urls
 
-
 def main(args):
-    urls = getItemURL(TYPES[args])
+    urls = getCityURL()
     mongo_table = db[args]
     path = '/run/media/jialin/Seagate/work/data/' + args
     # print(urls)
@@ -163,7 +125,8 @@ if __name__ == '__main__':
     # for arg in args:
     #     print(arg)
     args = ['jiudian', 'lingshi']
-    pool = Pool()
-    pool.map(main, args)  # 多进程运行
+    # pool = Pool()
+    # pool.map(main, args)  # 多进程运行
+    main(args)
     end = time.time()
     print('Finished, task runs %s seconds.' % (end - start))
