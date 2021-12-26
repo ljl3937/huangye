@@ -5,11 +5,12 @@ import re
 from multiprocessing import Pool
 import requests
 from bs4 import BeautifulSoup
-import pymongo
+# import pymongo
 
 from myconf.meijiu_config import *
 import time
 import codecs
+from xpinyin import Pinyin
 
 
 def download(url):
@@ -34,8 +35,8 @@ def getCityURL():
     return urls
 
 def getTels(city_url, path):
-    base_url = city_url[0]
-    type = city_url[1]
+    base_url = city_url[1]
+    type = city_url[0]
     time.sleep(3)
     tels = []
     pn = 1
@@ -48,12 +49,18 @@ def getTels(city_url, path):
             print('正在爬取' + type + '第' + str(pn) + '页')
             soup = BeautifulSoup(html, 'lxml')
             body = soup.body
+            pagerTitles = body.find_all('td', {'class': 'pagerTitle'})
+            total_page = 1
+            for pt in pagerTitles:
+                if '共' in pt.get_text():
+                    total_page = int(pt.get_text().split('共')[1].split('页')[0])
+            print(total_page)
             data_main = body.find('div', {'class': 'qyk_css08'})
             if data_main:
                 qys = data_main.find_all('div', {'class':'qy_div'})
                 for qy in qys:
                     try:
-                        name = qy.find('b').find('a').get_text()
+                        name = qy.find('b').find('a').get_text().replace('\n', '').replace('\r', '')
                         url_str = qy.find('b').find('a').get('href')
                         url1 = 'http://www.9928.tv' + url_str
                         print(url1)
@@ -64,12 +71,13 @@ def getTels(city_url, path):
                             soup1 = BeautifulSoup(html1, 'lxml')
                             body1 = soup1.body
                             tel_el = body1.find("div", class_="quick_nav").find("p", class_="nav_c")
-                            tel = tel_el.get_text()
+                            tel = tel_el.get_text().strip().replace('\n', '').replace('\r', '').replace('预约回电>>', '')
                         info = "%s %s" % (name,tel)
                         # infos.append(info)
-                        print(info)
-                        f.write(str(info))
-                        f.write('\n')
+                        if '留言后企业回电给您' not in info:
+                            print(info)
+                            f.write(str(info))
+                            f.write('\n')
                         # break
                     except:
                         pass
@@ -85,6 +93,8 @@ def getTels(city_url, path):
                     return tels
             except:
                 pass
+            if pn == total_page:
+                break
             pn += 1
     f.close()
 
@@ -104,18 +114,17 @@ def getItemURL(base_url):
             urls.append({title: link})
     return urls
 
-def main(args):
+def main():
+    p = Pinyin()
     urls = getCityURL()
-    mongo_table = db[args]
-    path = '/run/media/jialin/Seagate/work/data/' + args
+    # mongo_table = db['beijing']
+    # path = '/run/media/jialin/Seagate/work/data/'
+    path = '/home/jialin/code/huangye/data/'
     # print(urls)
     for url in urls:
-        for title in url:
-            if "北京" in title:
-                tels = getTels(url[title], title, path)
-                for tel in tels:
-                    if mongo_table.update_one({'province': title}, {'tel': tel}, True):
-                        print('已保存记录：', title, tel)
+        title = url[0]
+        if "河南" not in title and "北京" not in title and "山东" not in title:
+            getTels(url, path+p.get_pinyin(title, ''))
 
 
 if __name__ == '__main__':
@@ -127,6 +136,6 @@ if __name__ == '__main__':
     args = ['jiudian', 'lingshi']
     # pool = Pool()
     # pool.map(main, args)  # 多进程运行
-    main(args)
+    main()
     end = time.time()
     print('Finished, task runs %s seconds.' % (end - start))
